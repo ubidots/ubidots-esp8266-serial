@@ -17,12 +17,14 @@ Alternately, serving as a Wi-Fi adapter, wireless internet access can be added t
 ## Setup
 1. Check the pinout in the Arduino UNO module
 ![!Ups](https://raw.githubusercontent.com/guyz/pyesp8266/master/esp8266_pinout.png)
+
     Arduino ------ ESP8266
     * D2   --------> RXD
     * D3   --------> TXD
     * 3.3V --------> VCC
     * 3.3V --------> CH_PD
     * GND  --------> GND
+
 2. Download the UbidotsESP8266 library [here](https://github.com/ubidots/ubidots-esp8266/archive/master.zip)
 3. Go to the Arduino IDE, click on **Sketch -> Include Library -> Add .ZIP Library**
 4. Select the .ZIP file of Ubidots_Arduino_GPRS.h and then "Accept" or "Choose"
