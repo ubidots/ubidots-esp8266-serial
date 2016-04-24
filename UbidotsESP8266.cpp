@@ -1,3 +1,29 @@
+/*
+Copyright (c) 2013-2016 Ubidots.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Made by Mateo Velez - Metavix for Ubidots Inc
+*/
+
+
 #include "UbidotsESP8266.h"
 #include <SoftwareSerial.h>
 
@@ -12,9 +38,9 @@ Ubidots::Ubidots(char* token){
     val = (Value *)malloc(maxValues*sizeof(Value));
 }
 /** 
- * This function is to read the data from GPRS pins. This function is from Adafruit_FONA library
- * @arg timeout, time to delay until the data is transmited
- * @return replybuffer the data of the GPRS
+ * This function is to read the data from ESP8266 pins. This function is from Adafruit_FONA library
+ * @arg timeout of response
+ * @return the response buffer
  */
 char* Ubidots::readData(uint16_t timeout){
   uint16_t replyidx = 0;
@@ -44,7 +70,7 @@ char* Ubidots::readData(uint16_t timeout){
   }
   replybuffer[replyidx] = '\0';  // null term
 #ifdef DEBUG_UBIDOTS
-  Serial.println("Response of GPRS:");
+  Serial.println("Response of ESP8266:");
   Serial.println(replybuffer);
 #endif
   while(_client.available()){
@@ -53,10 +79,9 @@ char* Ubidots::readData(uint16_t timeout){
   return replybuffer;
 }
 /** 
- * This function is to set the APN, USER and PASSWORD
- * @arg apn the APN of your mobile
- * @arg user the USER of the APN
- * @arg pwd the PASSWORD of the APN
+ * This function is to set the WiFi connection
+ * @arg ssid of the WiFi
+ * @arg pass of the WiFi
  * @return true upon success
  */
 bool Ubidots::wifiConnection(char* ssid, char* pass){
@@ -69,13 +94,13 @@ bool Ubidots::wifiConnection(char* ssid, char* pass){
     _client.println(F("AT+RST"));
     if((strstr(readData(2000),"OK")==NULL)){
 #ifdef DEBUG_UBIDOTS
-        Serial.println(F("clearin data"));
+        Serial.println(F("Reset of ESP8266"));
 #endif
     }
     _client.println(F("AT+GMR"));
     if((strstr(readData(2000),"OK")==NULL)){
 #ifdef DEBUG_UBIDOTS
-        Serial.println(F("clearin data"));
+        Serial.println(F("Error at GMR"));
 #endif
     }
     _client.println(F("AT+CWMODE=3"));
@@ -92,7 +117,7 @@ bool Ubidots::wifiConnection(char* ssid, char* pass){
     _client.println(F("\""));            
     if(strstr(readData(15000),"ERROR")!=NULL){
 #ifdef DEBUG_UBIDOTS
-        Serial.println(F("Error with AT+CGATT"));
+        Serial.println(F("Error with AT+CWJAP"));
 #endif
         return false;
     }
@@ -100,7 +125,7 @@ bool Ubidots::wifiConnection(char* ssid, char* pass){
     if((strstr(readData(2000),"ERROR")!=NULL)){
     
 #ifdef DEBUG_UBIDOTS
-        Serial.println(F("Error with AT+CWMODE"));
+        Serial.println(F("Error with AT+CIFSR"));
 #endif
         return false;
     }
@@ -123,7 +148,7 @@ float Ubidots::getValue(char* id){
     }
     _client.println(F("AT+CIPMUX=0"));
     if(strstr(readData(3000),"ERROR")!=NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error at CIPMUX"));        
         return false;
     }
     _client.print(F("AT+CIPSTART=\"TCP\",\""));
@@ -131,17 +156,17 @@ float Ubidots::getValue(char* id){
     _client.print(F("\","));
     _client.println(PORT);
     if(strstr(readData(10000),"Ok Linked")!=NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error at CIPSTART"));
         return false;
     }
     _client.println(F("AT+CIPMODE=1"));
     if(strstr(readData(1000),"OK")==NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error at CIPMODE"));        
         return false;
     }
     _client.println(F("AT+CIPSEND"));
     if(strstr(readData(1000),">")==NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error at CIPSEND"));        
         return false;
     }
     _client.print(F("GET /api/v1.6/variables/"));
@@ -212,7 +237,7 @@ bool Ubidots::sendAll(){
     // Next for is to calculate the lenght of the data that you will send
     _client.println(F("AT+CIPMUX=0"));
     if(strstr(readData(3000),"ERROR")!=NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error at CIPMUX"));        
         return false;
     }
     _client.print(F("AT+CIPSTART=\"TCP\",\""));
@@ -220,17 +245,17 @@ bool Ubidots::sendAll(){
     _client.print(F("\","));
     _client.println(PORT);
     if(strstr(readData(10000),"Ok Linked")!=NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error at CIPSTART"));        
         return false;
     }
     _client.println(F("AT+CIPMODE=1"));
     if(strstr(readData(1000),"OK")==NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error at CIPMODE"));        
         return false;
     }
     _client.println(F("AT+CIPSEND"));
     if(strstr(readData(1000),">")==NULL){
-        Serial.println(F("Error"));        
+        Serial.println(F("Error CIPSEND"));        
         return false;
     }
     _client.println(F("POST /api/v1.6/collections/values/?force=true HTTP/1.1"));
