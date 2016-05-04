@@ -55,7 +55,7 @@ class Ubidots{
         bool wifiConnection(char* ssid, char* pass);
         bool saveValue(char *id, float value);
         float getValue(char* id);
-        void add(char *variable_id, double value, char *context1, char *context2);
+        void add(char *variable_id, double value, char *context1 = NULL, char *context2 = NULL);
         bool sendAll();  
 };
 #endif
