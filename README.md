@@ -97,7 +97,7 @@ Put your Ubidots token and variable ID's where indicated,  as well as the APN se
 Upload the code, open the Serial monitor to check the results. If no response is seen, try unplugging your Arduino and then plugging it again. Make sure the baud rate of the Serial monitor is set to the same one specified in your code.
 
 ```c++
-#include "UbidotsWizFi250.h"
+#include <UbidotsESP8266.h>
 #include <SoftwareSerial.h> 
 
 
