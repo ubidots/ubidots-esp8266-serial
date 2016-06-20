@@ -34,6 +34,8 @@ Ubidots::Ubidots(char* token) {
     _token = token;
     _client.begin(9600);
     currentValue = 0;
+    _dsName = "ESP8266";
+    _dsLabel = "esp-8266-identifier";
     val = (Value *)malloc(MAX_VALUES*sizeof(Value));
 }
 /** 
@@ -42,40 +44,39 @@ Ubidots::Ubidots(char* token) {
  * @return the response buffer
  */
 char* Ubidots::readData(uint16_t timeout) {
-  uint16_t replyidx = 0;
-  char replybuffer[550];
-  while (timeout--) {
-    if (replyidx >= 549) {
-      break;
-    }
-    while(_client.available()) {
-      char c =  _client.read();
-      if (c == '\r') continue;
-      if (c == 0xA) {
-        if (replyidx == 0)   // the first 0x0A is ignored
-          continue;
-      }
-      replybuffer[replyidx] = c;
-      replyidx++;
+    uint16_t replyidx = 0;
+    char replybuffer[550];
+    while (timeout--) {
         if (replyidx >= 549) {
             break;
         }
+        while (_client.available()) {
+            char c =  _client.read();
+            if (c == '\r') continue;
+            if (c == 0xA) {
+                if (replyidx == 0)   // the first 0x0A is ignored
+                    continue;
+            }
+            replybuffer[replyidx] = c;
+            replyidx++;
+            if (replyidx >= 549) {
+                break;
+            }
+        }
+        if (timeout == 0) {
+            break;
+        }
+        delay(1);
     }
-
-    if (timeout == 0) {
-      break;
-    }
-    delay(1);
-  }
-  replybuffer[replyidx] = '\0';  // null term
+    replybuffer[replyidx] = '\0';  // null term
 #ifdef DEBUG_UBIDOTS
-  Serial.println("Response of ESP8266:");
-  Serial.println(replybuffer);
+    Serial.println("Response of ESP8266:");
+    Serial.println(replybuffer);
 #endif
-  while(_client.available()){
-    _client.read();
-  }
-  return replybuffer;
+    while (_client.available()) {
+        _client.read();
+    }
+    return replybuffer;
 }
 /** 
  * This function is to set the WiFi connection
@@ -195,14 +196,13 @@ float Ubidots::getValue(char* id) {
  * @arg context2 context name : context value to save in a struct
  */
 void Ubidots::add(char *variable_id, float value, char *context1) {
-  (val+currentValue)->id = variable_id;
-  (val+currentValue)->value_id = value;
-  (val+currentValue)->context_1 = context1;
-  (val+currentValue)->context_2 = context2;
-  currentValue++;
-  if(currentValue >MAX_VALUES){
-    currentValue = MAX_VALUES;
-  }
+    (val+currentValue)->id = variable_id;
+    (val+currentValue)->value_id = value;
+    (val+currentValue)->context_1 = context1;
+    currentValue++;
+    if (currentValue > MAX_VALUES) {
+        currentValue = MAX_VALUES;
+    }
 }
 /**
  * Send all data of all variables that you saved
@@ -214,10 +214,10 @@ bool Ubidots::sendAll() {
     char data[256];
     sprintf(data, "=>");
     for (i = 0; i < currentValue; i++) {
-        str = String(((val+i)->value_id), 5);
+        str = String(((val+i)->value_id), 2);
         sprintf(data, "%s%s:%s", data, (val+i)->id, str.c_str());
-        if ((val+currentValue)->context) {
-            sprintf(data, "%s$%s", data, (val+i)->context);
+        if ((val+currentValue)->context_1) {
+            sprintf(data, "%s$%s", data, (val+i)->context_1);
         }
         sprintf(data, "%s,", data);
     }
@@ -252,15 +252,14 @@ bool Ubidots::sendAll() {
     _client.print(F("|POST|"));
     _client.print(_token);
     _client.print(F("|"));
-    _client.print(_dsTag);
+    _client.print(_dsLabel);
     _client.print(F(":"));
     _client.print(_dsName);
     _client.print(data);
     _client.println(F("|end"));
     _client.println(F("+++"));
-    if(strstr(readData(5000),">") != NULL){
-        Serial.println(F("Error"));     
-        
+    if(strstr(readData(5000),">") != NULL) {
+        Serial.println(F("Error"));
         return false;
     }
     // Next for is to send all data from the struct   
