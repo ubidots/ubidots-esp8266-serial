@@ -32,30 +32,33 @@ Made by Mateo Velez - Metavix for Ubidots Inc
 
 #define SERVER "things.ubidots.com"
 #define PORT 80
+#define MAX_VALUES 5
+#define USER_AGENT "ESP8266"
+#define VERSION "1.2"
 
 typedef struct Value {
   char  *id;
   char  *context_1;
-  char  *context_2;
   float value_id;
 } Value;
 
 class Ubidots{
-    private:
-        SoftwareSerial _client = SoftwareSerial(2, 3);      
-        char* _token;
-        char* readData(uint16_t timeout);
-        void flushInput();
-        uint8_t maxValues;
-        uint8_t currentValue;
-        Value * val;        
+ private:
+    SoftwareSerial _client = SoftwareSerial(2, 3);
+    char* readData(uint16_t timeout);
+    void flushInput();
+    uint8_t currentValue;
+    Value * val;
+    char* _token;
+    char* _dsName;
+    char* _dsLabel;
 
-    public:
-        Ubidots(char* token);
-        bool wifiConnection(char* ssid, char* pass);
-        bool saveValue(char *id, float value);
-        float getValue(char* id);
-        void add(char *variable_id, double value, char *context1 = NULL, char *context2 = NULL);
-        bool sendAll();  
+ public:
+    Ubidots(char* token);
+    bool wifiConnection(char* ssid, char* pass);
+    bool saveValue(char *id, float value);
+    float getValue(char* id);
+    void add(char *variable_id, float value, char *context1 = NULL);
+    bool sendAll();  
 };
 #endif
