@@ -30,19 +30,18 @@ Made by Mateo Velez - Metavix for Ubidots Inc
 /**
  * Constructor.
  */
-Ubidots::Ubidots(char* token){
+Ubidots::Ubidots(char* token) {
     _token = token;
     _client.begin(9600);
-    maxValues = 4;
     currentValue = 0;
-    val = (Value *)malloc(maxValues*sizeof(Value));
+    val = (Value *)malloc(MAX_VALUES*sizeof(Value));
 }
 /** 
  * This function is to read the data from ESP8266 pins. This function is from Adafruit_FONA library
  * @arg timeout of response
  * @return the response buffer
  */
-char* Ubidots::readData(uint16_t timeout){
+char* Ubidots::readData(uint16_t timeout) {
   uint16_t replyidx = 0;
   char replybuffer[550];
   while (timeout--) {
@@ -84,7 +83,7 @@ char* Ubidots::readData(uint16_t timeout){
  * @arg pass of the WiFi
  * @return true upon success
  */
-bool Ubidots::wifiConnection(char* ssid, char* pass){
+bool Ubidots::wifiConnection(char* ssid, char* pass) {
     _client.println(F("AT"));
     if((strstr(readData(2000),"OK")==NULL)){
 #ifdef DEBUG_UBIDOTS
@@ -135,7 +134,7 @@ bool Ubidots::wifiConnection(char* ssid, char* pass){
  * @arg id the id where you will get the data
  * @return num the data that you get from the Ubidots API
  */
-float Ubidots::getValue(char* id){
+float Ubidots::getValue(char* id) {
     float num;
     String raw;
     uint8_t bodyPosinit;
@@ -195,45 +194,34 @@ float Ubidots::getValue(char* id){
  * @arg context1 context name : context value to save in a struct
  * @arg context2 context name : context value to save in a struct
  */
-void Ubidots::add(char *variable_id, double value, char *context1, char *context2){
+void Ubidots::add(char *variable_id, float value, char *context1) {
   (val+currentValue)->id = variable_id;
   (val+currentValue)->value_id = value;
   (val+currentValue)->context_1 = context1;
   (val+currentValue)->context_2 = context2;
   currentValue++;
-  if(currentValue >maxValues){
-    currentValue = maxValues;
+  if(currentValue >MAX_VALUES){
+    currentValue = MAX_VALUES;
   }
 }
 /**
  * Send all data of all variables that you saved
  * @reutrn true upon success, false upon error.
  */
-bool Ubidots::sendAll(){
-    int i;
-    String all;
-    char vals[10];
+bool Ubidots::sendAll() {
+    uint8_t i;
     String str;
-    char b[3];
-    all = "[";
-    for(i=0; i<currentValue;){
-        str = String(((val+i)->value_id),5);
-        all += "{\"variable\": \"";
-        all += String((val + i)->id);
-        all += "\", \"value\":\"";
-        all += str;
-        all += "\", \"context\":{";
-        all += String((val+i)->context_1);
-        all += ", ";
-        all += String((val+i)->context_2);
-        all += "}}";
-        i++;
-        if(i<currentValue){
-            all += ", "; 
+    char data[256];
+    sprintf(data, "=>");
+    for (i = 0; i < currentValue; i++) {
+        str = String(((val+i)->value_id), 5);
+        sprintf(data, "%s%s:%s", data, (val+i)->id, str.c_str());
+        if ((val+currentValue)->context) {
+            sprintf(data, "%s$%s", data, (val+i)->context);
         }
+        sprintf(data, "%s,", data);
     }
-    all += "]";
-    i = all.length();
+    Serial.println(data);
     // Next for is to calculate the lenght of the data that you will send
     _client.println(F("AT+CIPMUX=0"));
     if(strstr(readData(3000),"ERROR")!=NULL){
@@ -258,20 +246,19 @@ bool Ubidots::sendAll(){
         Serial.println(F("Error CIPSEND"));        
         return false;
     }
-    _client.println(F("POST /api/v1.6/collections/values/?force=true HTTP/1.1"));
-    _client.println(F("Host: things.ubidots.com"));
-    _client.println(F("User-Agent: Arduino-ESP8266/1.0"));
-    _client.print(F("X-Auth-Token: "));
-    _client.println(_token);
-    _client.println(F("Connection: close"));
-    _client.println(F("Content-Type: application/json"));
-    _client.print(F("Content-Length: "));
-    _client.println(String(i));
-    _client.println();
-    _client.println(all);
-    _client.println();
+    _client.print(USER_AGENT);
+    _client.print(F("/"));
+    _client.print(VERSION);
+    _client.print(F("|POST|"));
+    _client.print(_token);
+    _client.print(F("|"));
+    _client.print(_dsTag);
+    _client.print(F(":"));
+    _client.print(_dsName);
+    _client.print(data);
+    _client.println(F("|end"));
     _client.println(F("+++"));
-    if(strstr(readData(5000),">")!=NULL){
+    if(strstr(readData(5000),">") != NULL){
         Serial.println(F("Error"));     
         
         return false;
