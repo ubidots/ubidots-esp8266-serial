@@ -30,8 +30,8 @@ Made by Mateo Velez - Metavix for Ubidots Inc
 #include "Arduino.h"
 #include <SoftwareSerial.h>
 
-#define SERVER "things.ubidots.com"
-#define PORT 80
+#define SERVER "translate.ubidots.com"
+#define PORT 9010
 #define MAX_VALUES 5
 #define USER_AGENT "ESP8266"
 #define VERSION "1.2"
