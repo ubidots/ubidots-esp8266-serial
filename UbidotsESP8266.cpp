@@ -151,10 +151,7 @@ float Ubidots::getValue(char* id) {
         Serial.println(F("Error at CIPMUX"));        
         return false;
     }
-    _client.print(F("AT+CIPSTART=\"TCP\",\""));
-    _client.print(SERVER);
-    _client.print(F("\","));
-    _client.println(PORT);
+    _client.println(F("AT+CIPSTART=\"TCP\",\"things.ubidots.com\",80"));
     if(strstr(readData(10000),"Ok Linked")!=NULL){
         Serial.println(F("Error at CIPSTART"));
         return false;
