@@ -157,12 +157,12 @@ float Ubidots::getValue(char* id) {
         return false;
     }
     _client.println(F("AT+CIPMODE=1"));
-    if(strstr(readData(1000),"OK")==NULL){
+    if(strstr(readData(2000),"OK")==NULL){
         Serial.println(F("Error at CIPMODE"));        
         return false;
     }
     _client.println(F("AT+CIPSEND"));
-    if(strstr(readData(1000),">")==NULL){
+    if(strstr(readData(5000),">")==NULL){
         Serial.println(F("Error at CIPSEND"));        
         return false;
     }
@@ -176,7 +176,7 @@ float Ubidots::getValue(char* id) {
     _client.println(F("Connection: close"));
     _client.println();
     _client.println(F("+++"));
-    char* reply = readData(5000);
+    char* reply = readData(10000);
     char* pch = strstr(reply,"\"value\":");
     raw = String(pch);
     bodyPosinit =9+ raw.indexOf("\"value\":");
@@ -234,12 +234,12 @@ bool Ubidots::sendAll() {
         return false;
     }
     _client.println(F("AT+CIPMODE=1"));
-    if(strstr(readData(1000),"OK")==NULL){
+    if(strstr(readData(2000),"OK")==NULL){
         Serial.println(F("Error at CIPMODE"));        
         return false;
     }
     _client.println(F("AT+CIPSEND"));
-    if(strstr(readData(1000),">")==NULL){
+    if(strstr(readData(5000),">")==NULL){
         Serial.println(F("Error CIPSEND"));        
         return false;
     }
@@ -255,7 +255,7 @@ bool Ubidots::sendAll() {
     _client.print(data);
     _client.println(F("|end"));
     _client.println(F("+++"));
-    if(strstr(readData(5000),">") != NULL) {
+    if(strstr(readData(10000),">") != NULL) {
         Serial.println(F("Error"));
         return false;
     }
