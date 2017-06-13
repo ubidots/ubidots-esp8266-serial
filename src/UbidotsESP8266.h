@@ -31,7 +31,6 @@ Made by: ----- María Carlina Hernández ---- Developer at Ubidots Inc
 #define __UbidotsESP8266_H_
 
 #include <ESP8266WiFi.h>
-#include "WiFiUdp.h"
 
 namespace {
     const char *  SERVER = "translate.ubidots.com";
@@ -40,17 +39,16 @@ namespace {
 
 class Ubidots {
  public:
-    Ubidots(char* token, const char* server = SERVER);
-    bool wifiConnection(char *ssid, char *pass);
+    Ubidots(const char* token, const char* server = SERVER);
+    bool wifiConnection(const char *ssid, const char *pass);
     void readData();    
  private:
     uint8_t sendData();
     uint8_t checkCommand();
     void readServer();
+    const char* _token;
     char _command[300];
-    char* _token;
     char* _request;
-    const char* _server;
     WiFiClient _client;
 };
 

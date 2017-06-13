@@ -1,8 +1,9 @@
 /****************************************
  * Define Constants
  ****************************************/
-String command = "";  // command
-String telemetry_unit = ""; // response of the telemetry unit
+
+char command[700];  // command
+char answer[100]; // answer from server
 
 /****************************************
  * Main Functions
@@ -13,17 +14,26 @@ void setup() {
 }
 
 void loop() {
-
-  if (Serial.available() > 0) { 
-    command = Serial.readString();  
-    /* Sends the command to the telemetry unit */
-    Serial.println(command);
-    Serial1.print(command); 
-  }
   
-  /* Reading the telemetry unit */
+  int i = 0;
+  int j = 0;
+  
+  if (Serial.available()){
+    while (Serial.available() > 0) {
+      command[i++] = (char)Serial.read();
+    }  
+    /* Sends the command to the telemetry unit */
+    Serial1.print(command); 
+    i = 0;
+  } 
+
   if (Serial1.available() > 0) {
-    telemetry_unit = Serial1.readString(); 
-    Serial.print(telemetry_unit);   
-  }   
+    /* Reading the telemetry unit */
+    while (Serial1.available() > 0) {
+      answer[j++] = (char)Serial1.read();
+    }
+    /* Response from the server */
+    Serial.print(answer);
+    j = 0;
+  }
 }

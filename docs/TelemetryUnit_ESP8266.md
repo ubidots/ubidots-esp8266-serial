@@ -6,7 +6,7 @@ In this case, we are using the ESP8266 as a telemetry unit. We collect the data 
 
 ## Hardware setup - Wiring
 
-It is important identify carefully the PINOUT of the ESP8266, because the ESP8266 can break if you make a wrong connection.
+**IT IS IMPORTANT IDENTIFY CAREFULLY THE PINOUT OF THE ESP8266, BECAUSE THE ESP8266 CAN BREAK IF YOU MAKE A WRONG CONNECTION**
 
 ![ESP8266 connection](https://raw.githubusercontent.com/guyz/pyesp8266/master/esp8266_pinout.png)
 
@@ -59,9 +59,11 @@ Once you have pasted the code below into the **Arduino IDE**, you will have to a
 /****************************************
  * Define Constants
  ****************************************/
-#define WIFISSID "Put_your_WIFI_SSID_here" // Assign your WiFi SSID 
-#define PASSWORD "Put_your_WIFI_password_here" // Assign your WiFi password
-#define TOKEN "Put_your_Ubidots_Token_here" // Assign your Ubidots TOKEN
+namespace { 
+  const char * WIFISSID = "Put_your_WIFI_SSID_here"; // Assign your WiFi SSID 
+  const char * PASSWORD = "Put_your_WIFI_password_here"; // Assign your WiFi password
+  const char * TOKEN = "Put_your_Ubidots_Token_here"; // Assign your Ubidots TOKEN
+}
 
 Ubidots client(TOKEN);
 

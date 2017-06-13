@@ -36,9 +36,8 @@ CONSTRUCTOR
  * Constructor.
  */
 
-Ubidots::Ubidots(char* token, const char* server) {
+Ubidots::Ubidots(const char* token, const char* server) {
     _token = token;
-    _server = server;
 }
 
 /***************************************************************************
@@ -69,6 +68,7 @@ uint8_t Ubidots::sendData() {
     uint8_t orderCode = checkCommand();
 
     if (orderCode > 0) {
+        /* Attempts five times to connect */
         while (!_client.connected()){
             _client.connect(SERVER, PORT);
             max_retries++;
@@ -77,12 +77,14 @@ uint8_t Ubidots::sendData() {
                 break;
             }
 
+            /*  Asks if it is connected */ 
             if (_client.connected()) {
                 if (orderCode == 1) {
                     Serial.println("OK, connected");
                     break;
                 } 
 
+                /* Sends data */
                 else if (orderCode == 2) {
                     _client.print(_request);
                     break;
@@ -120,18 +122,12 @@ void Ubidots::readServer() {
             }
         }
 
-        while (_client.available()) {
-            char c = _client.read();
-            if(c == -1){
-                Serial.println("ERROR");
-                _client.stop();
-                break;
-            }
-            response += c;
+        while (_client.available() > 0) {
+                char c = _client.read();
+                Serial.write(c);   
         }
-
-        Serial.println(response);
         _client.stop();
+        Serial.println("");
     }
 }
 
@@ -161,6 +157,7 @@ uint8_t Ubidots::checkCommand() {
             }
         }
 
+        /* Asks if it is online */
         if (i == 1) {
             if (strcmp(response, "ONLINE?") == 0) {
                 flag = 1;
@@ -193,7 +190,7 @@ AUXILIAR FUNCTIONS
  * @arg ssid of the WiFi
  * @arg pass of the WiFi
  */
-bool Ubidots::wifiConnection(char* ssid, char* pass) {
+bool Ubidots::wifiConnection(const char* ssid, const char* pass) {
     WiFi.begin(ssid, pass);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);

@@ -13,7 +13,7 @@ namespace {
 }
 
 char command[700]; // command
-String telemetry_unit = ""; // response of the telemetry unit
+char telemetry_unit[100]; // response of the telemetry unit
 
 /* Space to store values to send */
 char str_sensor1[10];
@@ -46,14 +46,18 @@ void loop() {
   //sprintf(command, "%s,%s:%s", command, VARIABLE_LABEL_2, str_sensor2); // uncomment this line to send sensor 2 values
   sprintf(command, "%s|end#final", command);
 
-  Serial.println(command);
+  /* Prints the command sent */
+  //Serial.println(command);// uncomment this line to print the command
+  
   /* Sends the command to the telemetry unit */
   Serial1.print(command);
 
   /* Reading the telemetry unit */
-  if (Serial1.available() > 0) {
-    telemetry_unit = Serial1.readString();
-    Serial.println(telemetry_unit);
+  int i = 0;
+  while (Serial1.available() > 0) {
+    telemetry_unit[i++] = (char)Serial1.read(); 
   }
+  Serial.println(telemetry_unit);
+  i = 0;
   delay(5000);
 }
