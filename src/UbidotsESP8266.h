@@ -1,6 +1,5 @@
-
 /*
-Copyright (c) 2013-2016 Ubidots.
+Copyright (c) 2017 Ubidots.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -21,44 +20,36 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Made by Mateo Velez - Metavix for Ubidots Inc
+Made by: ----- María Carlina Hernández ---- Developer at Ubidots Inc 
+         https://github.com/mariacarlinahernandez  
+         ----- Jose Garcia ---- Developer at Ubidots Inc 
+         https://github.com/jotathebest
+
 */
+
 #ifndef __UbidotsESP8266_H_
 #define __UbidotsESP8266_H_
-#define DEBUG_UBIDOTS
 
-#include "Arduino.h"
-#include <SoftwareSerial.h>
+#include <ESP8266WiFi.h>
 
-#define SERVER "translate.ubidots.com"
-#define PORT 9010
-#define MAX_VALUES 5
-#define USER_AGENT "ESP8266"
-#define VERSION "1.2"
+namespace {
+    const char *  SERVER = "translate.ubidots.com";
+    const int  PORT = 9012;
+}
 
-typedef struct Value {
-  char  *id;
-  char  *context_1;
-  float value_id;
-} Value;
-
-class Ubidots{
- private:
-    SoftwareSerial _client = SoftwareSerial(2, 3);
-    char* readData(uint16_t timeout);
-    void flushInput();
-    uint8_t currentValue;
-    Value * val;
-    char* _token;
-    char* _dsName;
-    char* _dsLabel;
-
+class Ubidots {
  public:
-    Ubidots(char* token);
-    bool wifiConnection(char* ssid, char* pass);
-    bool saveValue(char *id, float value);
-    float getValue(char* id);
-    void add(char *variable_id, float value, char *context1 = NULL);
-    bool sendAll();  
+    Ubidots(const char* token, const char* server = SERVER);
+    bool wifiConnection(const char *ssid, const char *pass);
+    void readData();    
+ private:
+    uint8_t sendData();
+    uint8_t checkCommand();
+    void readServer();
+    const char* _token;
+    char _command[300];
+    char* _request;
+    WiFiClient _client;
 };
+
 #endif
