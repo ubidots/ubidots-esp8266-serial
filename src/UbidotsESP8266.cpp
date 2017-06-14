@@ -94,7 +94,6 @@ uint8_t Ubidots::sendData() {
                     break;
                 }
             }
-            delay(5000);
         } 
     }
     return orderCode;
@@ -109,7 +108,6 @@ void Ubidots::readServer() {
 
     if (orderCode > 1) {
 
-        String response;
         int timeout = 0;
 
         while (!_client.available() && timeout < 5000) {
