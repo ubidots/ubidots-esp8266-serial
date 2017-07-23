@@ -57,7 +57,7 @@ These **request examples** will help you understand how to build the command:
 
 * Verify the connection (**ONLINE?**):
 
-> init#ONLINE?#end
+> init#ONLINE?#final
 
 * Send values to Ubidots (**POST**):
 > init#USER_AGENT/VERSION|POST|TOKEN|DEVICE_LABEL:DEVICE_NAME=>VARIABLE:VALUE|end#end
