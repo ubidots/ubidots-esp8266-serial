@@ -23,7 +23,7 @@ Before to start, you must choose which logger to use, in this case we decided us
 * [Ubidots Arduino ESP8266 library](https://github.com/ubidots/ubidots-esp8266-serial/archive/master.zip)
 * [Ubidots Account](https://ubidots.com/). 
 
-## Commnad request
+## Command request
 
 We have designed a simple payload format you can use to send/get data from your devices to/from Ubidots using this protocol.
 
