@@ -20,11 +20,10 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Made by: ----- María Carlina Hernández ---- Developer at Ubidots Inc 
-         https://github.com/mariacarlinahernandez  
-         ----- Jose Garcia ---- Developer at Ubidots Inc 
+Made by: ----- María Carlina Hernández ---- Developer at Ubidots Inc
+         https://github.com/mariacarlinahernandez
+         ----- Jose Garcia ---- Developer at Ubidots Inc
          https://github.com/jotathebest
-
 */
 
 #ifndef __UbidotsESP8266_H_
@@ -41,7 +40,7 @@ class Ubidots {
  public:
     Ubidots(const char* token, const char* server = SERVER);
     bool wifiConnection(const char *ssid, const char *pass);
-    void readData();    
+    void readData();
  private:
     uint8_t sendData();
     uint8_t checkCommand();
