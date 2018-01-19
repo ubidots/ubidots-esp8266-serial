@@ -1,8 +1,8 @@
 # Telemetry unit (ESP8266)  
 
-As we know **Telemetry** is an automated communications process by which measurements and other data is collected at remote or inaccessible points and transmitted to receiving equipment for monitoring. 
+As we know **Telemetry** is an automated communications process by which measurements and other data is collected at remote or inaccessible points and transmitted to receiving equipment for monitoring.
 
-In this case, we are using the ESP8266 as a telemetry unit. We collect the data from the logger (Arduino MEGA) and the ESP8266 will be in charge of sending the collected data to Ubidots. 
+In this case, we are using the ESP8266 as a telemetry unit. We collect the data from the logger (Arduino MEGA) and the ESP8266 will be in charge of sending the collected data to Ubidots.
 
 ## Hardware setup - Wiring
 
@@ -12,7 +12,7 @@ In this case, we are using the ESP8266 as a telemetry unit. We collect the data 
 
 To program the **ESP8266** you have to use a programmer as **UartSBee**, also you can use the **Arduino MEGA** to program the ESP8266. To upload the code into the ESP8266 you have to follow the connections below.
 
-* **ESP8266 - Arduino MEGA /  ESP8266 - UartSBee connections**: 
+* **ESP8266 - Arduino MEGA /  ESP8266 - UartSBee connections**:
 
 ESP8266 | Arduino MEGA | UartSBee
 --------|--------------|---------
@@ -59,8 +59,8 @@ Once you have pasted the code below into the **Arduino IDE**, you will have to a
 /****************************************
  * Define Constants
  ****************************************/
-namespace { 
-  const char * WIFISSID = "Put_your_WIFI_SSID_here"; // Assign your WiFi SSID 
+namespace {
+  const char * WIFISSID = "Put_your_WIFI_SSID_here"; // Assign your WiFi SSID
   const char * PASSWORD = "Put_your_WIFI_password_here"; // Assign your WiFi password
   const char * TOKEN = "Put_your_Ubidots_Token_here"; // Assign your Ubidots TOKEN
 }
@@ -69,7 +69,7 @@ Ubidots client(TOKEN);
 
 /****************************************
  * Main Functions
- ****************************************/ 
+ ****************************************/
 void setup() {
   Serial.begin(115200);
   client.wifiConnection(WIFISSID, PASSWORD);
@@ -81,9 +81,9 @@ void loop() {
 }
 ```
 
-Once the code is uploaded into the ESP8266, reference to the [Documentation](https://github.com/ubidots/ubidots-esp8266-serial/tree/master/docs/TelemetryUnit_ESP8266.md) of **telemetry unit - ESP8266** to find all the next steps required. 
+Once the code is uploaded into the ESP8266, reference to the [Documentation](https://github.com/ubidots/ubidots-esp8266-serial/tree/master/docs/TelemetryUnit_ESP8266.md) of **telemetry unit - ESP8266** to find all the next steps required.
 
-**NOTE**: The sampling frequency on the ESP8266 is of 1000 milliseconds
+**NOTE**: The sampling frequency on the ESP8266 is of **1000 milliseconds**
 
 ## FAQs and Troubleshooting
 
@@ -93,4 +93,4 @@ One of the most common troubleshooting with the ESP8266 is this one:
 
 If you got the issue above, please verify if the connections are in the right way, check if the Arduino **RST** is setted to **GND** , also verify if the board **Generic ESP8266 Module** is selected on the Arduino IDE.
 
-**NOTE**: If you use the Arduino MEGA to program the ESP8266 don't forget establish the new wires connections to be able to communicate the devices through the hardware serial port. 
+**NOTE**: If you use the Arduino MEGA to program the ESP8266 don't forget establish the new wires connections to be able to communicate the devices through the hardware serial port.
