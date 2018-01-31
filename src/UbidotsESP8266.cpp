@@ -48,15 +48,18 @@ FUNCTIONS TO MANAGE DATA
  * This function is to read the Ubidots' command via serial
  */
 void Ubidots::readData() {
-    bool flag = false;
+    bool bufferData = false; // control the flow of the incoming data
     int i = 0;
 
     while (Serial.available() > 0) {
       this->_command[i++] = (char) Serial.read();
-      flag = true;
+      // Once the data is readed, the status of the flag change to true
+      bufferData = true;
     }
 
-    if (flag) {
+    /* if there are data available, that is to say if the flag is true,
+       handle the request */
+    if (bufferData) {
       readServer();
       memset(this->_command, 0, sizeof(this->_command));
     }
