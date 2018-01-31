@@ -4,7 +4,7 @@ The logger will be in charge of taking sensor (pin) readings and send values to 
 
 You can use any microcontroller as logger, but please note that if the logger (microcontroller) does not have more than one hardware serial ports you will not able to visualize the response, but it is also possible to send data without any issue.
 
-We decided to used the **Arduino MEGA** as logger, because it has more than one hardware serial ports available.
+We decided to used the **Arduino MEGA** as logger, because it has more than one hardware serial port available.
 
 ## Hardware setup - Wiring
 
@@ -95,7 +95,7 @@ As you can see at the first part of the code you just have to assign your Ubidot
  * Define Constants
  ****************************************/
 namespace {
-  bool flag = true;
+  bool flow_control = true; // control the flow of the requests
   const char * USER_AGENT = "UbidotsESP8266"; // Assgin the user agent
   const char * VERSION =  "1.0"; // Assign the version
   const char * METHOD = "POST"; // Set the method
@@ -104,7 +104,6 @@ namespace {
   const char * VARIABLE_LABEL = "temp"; // Assign the variable label
 }
 
-char* command = (char *) malloc(sizeof(char) * 128);
 char telemetry_unit[100]; // response of the telemetry unit
 
 /* Space to store values to send */
@@ -120,9 +119,11 @@ void setup() {
 }
 
 void loop() {
-
+  char* command = (char *) malloc(sizeof(char) * 128);
   /* Wait for the server response to read the values and built the command */
-  if (flag) {
+  /* While the flag is true it will take the sensors readings, build the command,
+     and post the command to Ubidots */
+  if (flow_control) {
     /* Analog reading */
     float sensor1 = analogRead(A0);
     float sensor2 = analogRead(A1);
@@ -145,8 +146,9 @@ void loop() {
     Serial1.print(command);
     /* free memory*/
     free(command);
-    /* Change the status of the flag */
-    flag = false;
+    /* Change the status of the flag to false. Once the data is sent, the status
+       of the flag will change to true again */
+    flow_control = false;
   }
 
   /* Reading the telemetry unit */
@@ -154,10 +156,10 @@ void loop() {
   while (Serial1.available() > 0) {
     telemetry_unit[i++] = (char)Serial1.read();
     /* Change the status of the flag; allows the next command to be built */
-    flag = true;
+    flow_control = true;
   }
 
-  if (flag) {
+  if (flow_control) {
     /* Print the server response -> OK */
     Serial.write(telemetry_unit);
     /* free memory */
