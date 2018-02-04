@@ -20,9 +20,9 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Made by: ----- María Carlina Hernández ---- Developer at Ubidots Inc 
-         https://github.com/mariacarlinahernandez  
-         ----- Jose Garcia ---- Developer at Ubidots Inc 
+Made by: ----- María Carlina Hernández ---- Developer at Ubidots Inc
+         https://github.com/mariacarlinahernandez
+         ----- Jose Garcia ---- Developer at Ubidots Inc
          https://github.com/jotathebest
 */
 
@@ -48,53 +48,56 @@ FUNCTIONS TO MANAGE DATA
  * This function is to read the Ubidots' command via serial
  */
 void Ubidots::readData() {
-
+    bool bufferData = false; // control the flow of the incoming data
     int i = 0;
+
     while (Serial.available() > 0) {
       this->_command[i++] = (char) Serial.read();
+      // Once the data is readed, the status of the flag change to true
+      bufferData = true;
     }
 
-    i = 0;
-    readServer();
-    memset(this->_command, 0, sizeof(this->_command));
+    /* if there are data available, that is to say if the flag is true,
+       handle the request */
+    if (bufferData) {
+      readServer();
+      memset(this->_command, 0, sizeof(this->_command));
+    }
 }
 
 /**
  * This function establish the connection and send the request to the server
  */
-uint8_t Ubidots::sendData() {   
-    
+uint8_t Ubidots::sendData() {
+
     uint8_t max_retries = 0;
     uint8_t orderCode = checkCommand();
 
     if (orderCode > 0) {
         /* Attempts five times to connect */
         while (!_client.connected()){
-            _client.connect(SERVER, PORT);
+            if (_client.connect(SERVER, PORT)) {
+              break;
+            }
             max_retries++;
             if (max_retries>5) {
-                Serial.println("ERROR");
+                Serial.println("ERROR... Could not connect to server");
                 break;
             }
+            delay(5000);
+        }
 
-            /*  Asks if it is connected */ 
-            if (_client.connected()) {
-                if (orderCode == 1) {
-                    Serial.println("OK, connected");
-                    break;
-                } 
-
-                /* Sends data */
-                else if (orderCode == 2) {
-                    _client.print(_request);
-                    break;
-                } 
-
-                else {
-                    break;
-                }
+        /*  Asks if it is connected */
+        if (_client.connected()) {
+            if (orderCode == 1) {
+                Serial.println("OK, connected");
             }
-        } 
+
+            /* Sends data */
+            else if (orderCode == 2) {
+                _client.print(_request);
+            }
+        }
     }
     return orderCode;
 }
@@ -122,7 +125,7 @@ void Ubidots::readServer() {
 
         while (_client.available() > 0) {
                 char c = _client.read();
-                Serial.write(c);   
+                Serial.write(c);
         }
         _client.stop();
         Serial.println("");
